@@ -19,6 +19,20 @@ class Road {
     };
   }
 
+  updateDimensions(canvasHeight, scale) {
+    this.canvasHeight = canvasHeight;
+    this.height = canvasHeight / 4;
+    this.y = this.canvasHeight - this.height;
+
+    if (this.img && this.img.isReady) {
+      this.width = (this.img.naturalWidth / this.img.naturalHeight) * this.height;
+    }
+
+    if (this.x <= -this.width) {
+      this.x = 0;
+    }
+  }
+
   draw() {
     if (this.img.isReady) {
       this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
