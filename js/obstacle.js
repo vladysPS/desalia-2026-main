@@ -1,25 +1,48 @@
 class Obstacle {
-  constructor(ctx, canvasWidth, canvasHeight, road) {
+  constructor(ctx, canvasWidth, canvasHeight, road, scale = 1) {
     this.ctx = ctx;
     this.road = road;
+
+    this.baseWidth = 60;
+    this.baseHeight = 80;
+    this.scale = scale;
 
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
 
-    this.width = 60;
-    this.height = 80;
+    this.width = this.baseWidth * this.scale;
+    this.height = this.baseHeight * this.scale;
 
     this.x = canvasWidth + this.width;
 
-    // Y aleatorio (entre suelo y una altura superior)
-    const ground = canvasHeight;
-    const minY = ground - this.height;
-    const maxY = ground - this.height - canvasHeight * 0.3;
-
-    this.y = 500;
-    console.log("this y", this.y)
+    this.setYPosition();
 
     this.isOffscreen = false;
+  }
+
+  setYPosition() {
+    // Anchor obstacle so its bottom sits at the vertical midpoint of the road
+    const roadCenterY = this.road
+      ? this.road.y + this.road.height / 2
+      : this.canvasHeight - this.height / 2; // fallback: center above canvas bottom
+
+    this.y = roadCenterY - this.height;
+  }
+
+  updateDimensions(canvasWidth, canvasHeight, scale, road) {
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
+    if (road) this.road = road;
+    this.scale = scale;
+
+    // Recompute size and X/Y relative to new scale/canvas
+    const progress = 1 - (this.x / (this.canvasWidth + this.width)); // 0 at spawn, >1 when offscreen
+
+    this.width = this.baseWidth * scale;
+    this.height = this.baseHeight * scale;
+
+    this.x = this.canvasWidth + this.width - progress * (this.canvasWidth + this.width);
+    this.setYPosition();
   }
 
   move() {

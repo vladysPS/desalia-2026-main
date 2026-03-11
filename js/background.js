@@ -18,6 +18,16 @@ class Background {
     };
   }
 
+  updateDimensions(canvasHeight, scale) {
+    this.height = canvasHeight;
+    this.canvasWidth = this.ctx.canvas.width;
+
+    if (this.img && this.img.isReady) {
+      this.width =
+        (this.img.naturalWidth / this.img.naturalHeight) * this.height;
+    }
+  }
+
   draw() {
     if (this.img.isReady) {
       this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height);

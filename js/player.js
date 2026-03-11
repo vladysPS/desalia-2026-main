@@ -1,10 +1,19 @@
 class Player {
-  constructor(ctx, canvasHeight,soundJump) {
+  constructor(ctx, canvasHeight, soundJump, scale = 1) {
     this.ctx = ctx;
 
-    this.x = 100;
-    this.width = 120;
-    this.height = 150;
+    this.canvasHeight = canvasHeight;
+    this.scale = scale;
+
+    this.baseWidth = 120;
+    this.baseHeight = 150;
+    this.baseX = 100;
+    this.baseGravity = 0.5;
+    this.baseJumpStrength = -15;
+
+    this.width = this.baseWidth * scale;
+    this.height = this.baseHeight * scale;
+    this.x = this.baseX * scale;
     this.playerGroundposition = canvasHeight - this.height - (canvasHeight / 8);
     this.y = this.playerGroundposition;
 
@@ -27,8 +36,8 @@ class Player {
     this.spriteFrameCounter = 0;
 
     this.vy = 0;
-    this.gravity = 0.5;
-    this.jumpStrength = -15;
+    this.gravity = this.baseGravity * scale;
+    this.jumpStrength = this.baseJumpStrength * scale;
 
     this.soundJump = soundJump;
 
@@ -39,6 +48,31 @@ class Player {
         event.preventDefault();
       }
     });
+  }
+
+  updateDimensions(canvasHeight, scale) {
+    const previousHeight = this.canvasHeight || canvasHeight;
+    const previousGround =
+      this.playerGroundposition ?? (previousHeight - this.height - previousHeight / 8);
+    const distanceFromGround = previousGround - this.y;
+    const previousScale = this.scale || 1;
+
+    this.canvasHeight = canvasHeight;
+    this.scale = scale;
+
+    this.width = this.baseWidth * scale;
+    this.height = this.baseHeight * scale;
+    this.x = this.baseX * scale;
+
+    this.gravity = this.baseGravity * scale;
+    this.jumpStrength = this.baseJumpStrength * scale;
+
+    this.playerGroundposition = canvasHeight - this.height - (canvasHeight / 8);
+
+    const heightRatio = canvasHeight / previousHeight || 1;
+    const scaledDistance = distanceFromGround * heightRatio;
+    this.y = Math.min(this.playerGroundposition - scaledDistance, this.playerGroundposition);
+    this.vy *= scale / previousScale;
   }
 
   jump() {
