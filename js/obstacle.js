@@ -1,17 +1,35 @@
+const obstacleImages = {
+    botella: new Image(),
+    altavoz: new Image(),
+    flamenco: new Image()
+};
+
+obstacleImages.botella.src = '/imgs/obstacles/botella-barcelo.png';
+obstacleImages.altavoz.src = '';
+obstacleImages.flamenco.src = '';
 class Obstacle {
   constructor(ctx, canvasWidth, canvasHeight, road, scale = 1) {
     this.ctx = ctx;
     this.road = road;
 
-    this.baseWidth = 60;
+    this.baseWidth = 45;
     this.baseHeight = 80;
     this.scale = scale;
+
+    // OBSTACLES TYPES
+    this.obstacleTypes = ["botella", "altavoz", "flamenco"];
+
+    // Pick random obstacle ***UNCOMMENT WHEN I HAVE THE DESIGNS***
+    //const obstalceIndex = Math.floor(Math.random() * this.obstacleType.length);
+    //const obstacle = this.obstacleTypes[obstalceIndex];
+    this.obstacleImage = obstacleImages.botella
 
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
 
     this.width = this.baseWidth * this.scale;
     this.height = this.baseHeight * this.scale;
+
 
     this.x = canvasWidth + this.width;
 
@@ -45,8 +63,8 @@ class Obstacle {
     this.setYPosition();
   }
 
-  move() {
-    this.x -= this.road.speed;
+  move(dt = 1 / 60) {
+    this.x -= this.road.speed * dt;
 
     if (this.x + this.width < 0) {
       this.isOffscreen = true;
@@ -54,8 +72,15 @@ class Obstacle {
   }
 
   draw() {
-    this.ctx.fillStyle = 'red';
-    this.ctx.fillRect(this.x, this.y, this.width, this.height);
+    // Collision shape: two rectangles forming a bottle-like hitbox
+    this.ctx.fillRect(this.x, this.y + this.height * 0.4, this.width, this.height * 0.6);
+    this.ctx.fillRect(this.x + this.width * 0.25, this.y, this.width * 0.5, this.height * 0.4);
+
+    // Visual: paint the sprite on top (collision still uses the rectangles above)
+    if (this.obstacleImage && this.obstacleImage.complete && this.obstacleImage.naturalWidth > 0) {
+      this.ctx.drawImage(this.obstacleImage, this.x, this.y, this.width, this.height);
+    }
+
   }
 }
 

@@ -37,10 +37,10 @@ class Background {
   // Move the background left by xx pixels per frame
   // Once the image is off the screen, mark it as finished
   // Call the stopGame method from Game class once the image is finished
-  move() {
+  move(dt = 1 / 60) {
     this.xWhereStop = -this.width + this.canvasWidth;
     if (this.x > this.xWhereStop) {
-      this.x -= this.speed;
+      this.x -= this.speed * dt;
     } else {
       this.game.stopGame();
     }

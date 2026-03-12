@@ -1,21 +1,22 @@
 class Player {
-  constructor(ctx, canvasHeight, soundJump, scale = 1) {
+  constructor(ctx, canvasHeight, soundJump, road, scale = 1) {
     this.ctx = ctx;
 
     this.canvasHeight = canvasHeight;
     this.scale = scale;
+    this.road = road;
 
     this.baseWidth = 120;
     this.baseHeight = 150;
     this.baseX = 100;
-    this.baseGravity = 0.5;
-    this.baseJumpStrength = -15;
+    // Convert original per-frame physics to per-second values (60fps baseline)
+    // Acceleration needs fps^2 to keep the same time-to-apex as the old frame-based logic
+    this.baseGravity = 1800; // px/s^2  (0.5 * 60 * 60)
+    this.baseJumpStrength = -900; // px/s (-15 * 60)
 
     this.width = this.baseWidth * scale;
     this.height = this.baseHeight * scale;
     this.x = this.baseX * scale;
-    this.playerGroundposition = canvasHeight - this.height - (canvasHeight / 8);
-    this.y = this.playerGroundposition;
 
     this.img = new Image();
     this.img.src = "imgs/skater-sprite-1.png";
@@ -34,10 +35,14 @@ class Player {
     this.xFrame = 0;
     this.yFrame = 0;
     this.spriteFrameCounter = 0;
+    this.animationTimer = 0; // seconds accumulator
 
     this.vy = 0;
     this.gravity = this.baseGravity * scale;
     this.jumpStrength = this.baseJumpStrength * scale;
+
+    this.playerGroundposition = this.computeGroundPosition(canvasHeight, this.height);
+    this.y = this.playerGroundposition;
 
     this.soundJump = soundJump;
 
@@ -52,10 +57,9 @@ class Player {
 
   updateDimensions(canvasHeight, scale) {
     const previousHeight = this.canvasHeight || canvasHeight;
-    const previousGround =
-      this.playerGroundposition ?? (previousHeight - this.height - previousHeight / 8);
-    const distanceFromGround = previousGround - this.y;
     const previousScale = this.scale || 1;
+    const previousGround = this.playerGroundposition ?? this.computeGroundPosition(previousHeight, this.height);
+    const distanceFromGround = previousGround - (this.y ?? previousGround);
 
     this.canvasHeight = canvasHeight;
     this.scale = scale;
@@ -67,12 +71,30 @@ class Player {
     this.gravity = this.baseGravity * scale;
     this.jumpStrength = this.baseJumpStrength * scale;
 
-    this.playerGroundposition = canvasHeight - this.height - (canvasHeight / 8);
+    this.playerGroundposition = this.computeGroundPosition(canvasHeight, this.height);
 
     const heightRatio = canvasHeight / previousHeight || 1;
     const scaledDistance = distanceFromGround * heightRatio;
     this.y = Math.min(this.playerGroundposition - scaledDistance, this.playerGroundposition);
     this.vy *= scale / previousScale;
+  }
+
+  computeGroundPosition(canvasHeight = this.canvasHeight, playerHeight = this.height) {
+    const roadIsReady =
+      this.road &&
+      this.road.img &&
+      this.road.img.isReady &&
+      this.road.height > 0;
+
+    if (roadIsReady) {
+      const roadMiddleY = this.road.y + this.road.height / 2;
+      return roadMiddleY - playerHeight;
+    }
+
+    const effectiveCanvasHeight = canvasHeight ?? this.canvasHeight;
+    if (!effectiveCanvasHeight) return 0;
+
+    return effectiveCanvasHeight - playerHeight - effectiveCanvasHeight / 8;
   }
 
   jump() {
@@ -84,7 +106,7 @@ class Player {
     }
   }
 
-  draw() {
+  draw(dt = 1 / 60) {
     const inAir = this.y < this.playerGroundposition;
     const img = inAir ? this.imgJump : this.img;
     const hFrames = inAir ? this.jumpingHorizontalFrames : this.runningHorizontalFrames;
@@ -109,19 +131,23 @@ class Player {
 
     this.ctx.restore();
 
-    this.spriteFrameCounter++;
- 
-    if (this.spriteFrameCounter % 8 === 0) {
+    // Advance animation based on time (roughly one frame every 8 game frames at 60fps)
+    this.animationTimer += dt;
+    const frameDuration = (8 / 60); // seconds per sprite frame
+    if (this.animationTimer >= frameDuration) {
+      this.animationTimer -= frameDuration;
       this.xFrame += 1;
       if (this.xFrame >= endX) this.xFrame = 0;
     }
   }
 
-  move() {
-    this.y += this.vy;
+  move(dt = 1 / 60) {
+    this.playerGroundposition = this.computeGroundPosition(this.canvasHeight, this.height);
+
+    this.y += this.vy * dt;
 
     if (this.y < this.playerGroundposition) {
-      this.vy += this.gravity;
+      this.vy += this.gravity * dt;
     }
 
     if (this.y >= this.playerGroundposition) {
