@@ -7,9 +7,7 @@ class Road {
     this.width = this.ctx.canvas.width;
     this.height = 0;
     this.y = 0;
-    console.log("canvas height", canvasHeight)
-    console.log("road height", this.height)
-    console.log("this.y", this.y)
+    this.offset = 80;
 
     this.img = new Image();
     this.img.src = "imgs/camino-desalia-2.png";
@@ -19,11 +17,11 @@ class Road {
       this.img.isReady = true;
       const aspectRatio = this.img.naturalHeight / this.img.naturalWidth;
       this.height = this.width * aspectRatio;
-      this.y = this.canvasHeight - this.height;
+      this.y = this.canvasHeight - this.height - this.offset;
     };
   }
 
-  updateDimensions(canvasHeight, scale) {
+  updateDimensions(canvasHeight) {
     this.canvasHeight = canvasHeight;
     this.width = this.ctx.canvas.width;
 

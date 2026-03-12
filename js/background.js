@@ -1,6 +1,6 @@
 class Background {
   constructor(ctx, imgHeight, initialX, speed) {
-    this.imgSrc = "imgs/background/zm1-peq.png";
+    this.imgSrc = "imgs/background/background-test.png";
     this.speed = speed;
 
     this.ctx = ctx;
@@ -42,7 +42,7 @@ class Background {
     if (this.x > this.xWhereStop) {
       this.x -= this.speed * dt;
     } else {
-      this.game.stopGame();
+      this.game.stopGame("win");
     }
   }
 }
