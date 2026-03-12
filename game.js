@@ -6,11 +6,18 @@ import Obstacle from './js/obstacle.js';
 class Game {
   constructor(ctx) {
     this.ctx = ctx;
-    this.intervalId = undefined; // to set loop and stop it
+    this.rafId = undefined; // requestAnimationFrame id
+    this.isRunning = false;
+    this.lastTime = 0;
     this.todoRectoSinMiedo = false; 
-    this.baseWidth = 1225;
-    this.baseHeight = 700;
+    this.baseWidth = 1920;
+    this.baseHeight = 1080;
     this.targetAspect = this.baseWidth / this.baseHeight; // used to scale elements accordingly
+
+    // Speeds expressed in px/s for base scale (scale = 1)
+    this.roadBaseSpeed = 1200; 
+    this.roadAccelBase = 25;  
+    this.backBaseSpeed = 300;  // 1px per frame at 60fps
 
     // SOUNDS
     this.isThemePlaying = false;
@@ -25,8 +32,8 @@ class Game {
 
     // OBSTACLES
     this.obstacles = [];
-    this.obstacleTimer = 0;
-    this.obstacleInterval = this.getRandomObstacleTime();
+    this.obstacleTimer = 0; // seconds
+    this.obstacleInterval = this.getRandomObstacleTime(); // seconds
     this.hasCollision = false;
 
     this.setResponsiveSizes();
@@ -34,31 +41,31 @@ class Game {
       this.setResponsiveSizes();
     });
  
-    this.backSpeed = 1;
     this.background = new Background(this.ctx, this.canvasHeight, 0, this.backSpeed);
     this.background.game = this; // Pass the current Game instance to the Background so I can stop the game
     
-    this.roadSpeed =7;
     this.road = new Road(this.ctx, this.roadSpeed, this.canvasHeight);
     
-    this.player = new Player(this.ctx, this.canvasHeight, this.soundJump, this.scale);
+    this.player = new Player(this.ctx, this.canvasHeight, this.soundJump, this.road, this.scale);
   }
   getRandomObstacleTime() {
-    return 60 + Math.random() * 120; // entre 1 y 3 segundos aprox (en frames a 60fps)    
+    return 1 + Math.random() * 2; // between 1s and 3s
   }
   setResponsiveSizes() {
+    const previousScale = this.scale || 1;
     const canvasContainer = document.getElementById('canvas-container');
     if (!canvasContainer) return;
 
-    const padding = 24; // breathing room around the canvas
-    const maxWidth = Math.min(window.innerWidth - padding, this.baseWidth);
-    const maxHeight = Math.min(window.innerHeight - padding, this.baseHeight);
+    const padding = 24; // breathing room around the canvas (all sides)
+    const availableWidth = Math.max(window.innerWidth - padding * 2, 320);
+    const availableHeight = Math.max(window.innerHeight - padding * 2, 180);
 
-    let width = maxWidth;
+    let width = availableWidth;
     let height = width / this.targetAspect;
 
-    if (height > maxHeight) {
-      height = maxHeight;
+    // If the computed height overflows the viewport, constrain by height instead.
+    if (height > availableHeight) {
+      height = availableHeight;
       width = height * this.targetAspect;
     }
 
@@ -72,12 +79,30 @@ class Game {
     this.ctx.canvas.width = this.canvasWidth;
     this.ctx.canvas.height = this.canvasHeight;
 
+    // Re-scale speeds so motion stays proportional to canvas size
+    const scaleRatio = this.scale / previousScale;
+    if (this.roadSpeed === undefined) {
+      this.roadSpeed = this.roadBaseSpeed * this.scale;
+      this.roadAccel = this.roadAccelBase * this.scale;
+    } else {
+      this.roadSpeed *= scaleRatio;
+      this.roadAccel *= scaleRatio;
+    }
+
+    if (this.backSpeed === undefined) {
+      this.backSpeed = this.backBaseSpeed * this.scale;
+    } else {
+      this.backSpeed *= scaleRatio;
+    }
+
     // Propagate new sizes to game elements
     if (this.road && typeof this.road.updateDimensions === 'function') {
       this.road.updateDimensions(this.canvasHeight, this.scale);
+      this.road.speed = this.roadSpeed;
     }
     if (this.background && typeof this.background.updateDimensions === 'function') {
       this.background.updateDimensions(this.canvasHeight, this.scale);
+      this.background.speed = this.backSpeed;
     }
     if (this.player && typeof this.player.updateDimensions === 'function') {
       this.player.updateDimensions(this.canvasHeight, this.scale);
@@ -113,8 +138,16 @@ class Game {
     }
   }
   gameLoop() {
-    if (!this.intervalId) {
-      this.intervalId = setInterval(() => {
+    if (this.isRunning) return;
+
+    this.isRunning = true;
+    this.lastTime = performance.now();
+
+    const step = (timestamp) => {
+      if (!this.isRunning) return;
+
+      const dt = Math.min((timestamp - this.lastTime) / 1000, 0.05); // seconds, clamp to avoid big jumps
+      this.lastTime = timestamp;
         
         if (!this.isThemePlaying) {
           this.theme.loop = true;
@@ -122,20 +155,22 @@ class Game {
           // this.theme.play();
           this.isThemePlaying = true;
         }
+
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         
-        this.roadSpeed += 0.005;
+      // accelerate road speed over time
+      this.roadSpeed += this.roadAccel * dt;
         this.road.speed = this.roadSpeed;
         
-        this.background.move();
+      this.background.move(dt);
         this.background.draw();
-        this.road.move();
+      this.road.move(dt);
         this.road.draw();
-        this.player.move();
-        this.player.draw();
+      this.player.move(dt);
+      this.player.draw(dt);
 
         // OBSTACLES
-        this.obstacleTimer++;
+      this.obstacleTimer += dt;
         if (this.obstacleTimer >= this.obstacleInterval) {
           this.obstacles.push(
             new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale)
@@ -145,7 +180,7 @@ class Game {
         }
 
         this.obstacles.forEach(obstacle => {
-          obstacle.move();
+        obstacle.move(dt);
           obstacle.draw();
         });
 
@@ -155,13 +190,18 @@ class Game {
           this.collisions();
         }
 
-      }, 1000 / 60);
+      if (this.isRunning) {
+        this.rafId = requestAnimationFrame(step);
     }
-  }
+    };
 
+    this.rafId = requestAnimationFrame(step);
+  }
   stopGame() {
-    clearInterval(this.intervalId);
-    this.intervalId = undefined;
+    if (!this.isRunning) return;
+    cancelAnimationFrame(this.rafId);
+    this.rafId = undefined;
+    this.isRunning = false;
 
     this.theme.pause();
     this.isThemePlaying = false;

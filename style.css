@@ -1,6 +1,7 @@
 body {
   margin: 0;
 }
+
 .hidden {
   display: none;
 }
@@ -9,80 +10,56 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background:black; 
+  background: black;
   min-height: 100vh;
-
-  #canvas-container {
-    position: relative;
-    aspect-ratio: 2/1;
-    height: 90vh;
-    max-height:700px;
-    width: auto;
-    overflow: hidden;
-    box-sizing: border-box;
- 
-
-    #poster {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url("../imgs/poster-desk.png");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 100% auto;
-    }
-
-    #startBtn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      z-index: 1;
-      transform: translate(-50%, -50%);
-      img{
-        width: 100px;
-      }
-    }
-  }
 }
 
-/* DESKTOP */
-@media (min-width: 800px) {
-  .game-main-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background:black; 
-  min-height: 100vh;
+#canvas-container {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* Keep the container at the game's native aspect ratio (1920x1080 = 16:9).
+     The actual pixel size is set in JS so the ratio stays consistent while scaling. */
+  aspect-ratio: 16 / 9;
+  max-width: 100vw;
+  max-height: 100vh;
+}
 
+#poster {
+  position: absolute;
+  inset: 0;
+  background-image: url("../imgs/poster-desk.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% auto;
+}
+
+#startBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+}
+
+#startBtn img {
+  width: 140px;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (min-width: 800px) {
   #canvas-container {
-    position: relative;
-    aspect-ratio: 2/1;
-    height: 90vh;
-    max-height:700px;
-    width: auto;
     border-radius: 30px;
     border: 2px solid rgb(0, 42, 70);
-    box-shadow: -5px 5px 0px 0px rgb(0, 42, 70);
- 
-    overflow: hidden;
-    box-sizing: border-box;
- 
-
-    #poster {
-      background-image: url("../imgs/poster-desk.png");
-    }
-    #startBtn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      z-index: 1;
-      transform: translate(-50%, -50%);
-      img{
-        width: 180px
-      }
-    }
+    box-shadow: -5px 5px 0 0 rgb(0, 42, 70);
   }
-}
+
+  #startBtn img {
+    width: 180px;
+  }
 }
