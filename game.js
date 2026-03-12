@@ -9,7 +9,7 @@ class Game {
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = false; 
+    this.todoRectoSinMiedo = true; 
 
     this.baseWidth = 1920;
     this.baseHeight = 1080;
@@ -173,8 +173,17 @@ class Game {
         // OBSTACLES
       this.obstacleTimer += dt;
         if (this.obstacleTimer >= this.obstacleInterval) {
+          // Generate random number between 0 and 5 to choose a random obstacle, with more possibilities of the first three 
+          const obstacleNumber = (() => {
+            const r = Math.random();
+            return r < 0.8             // 80% chance
+              ? Math.floor(Math.random() * 4)   // 0–3
+              : 4 + Math.floor(Math.random() * 2); // 20% chance → 4 or 5
+          })();
+
+
           this.obstacles.push(
-            new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale)
+            new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale, obstacleNumber)
           );
           this.obstacleTimer = 0;
           this.obstacleInterval = this.getRandomObstacleTime();

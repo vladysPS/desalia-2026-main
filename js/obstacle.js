@@ -8,16 +8,14 @@ obstacleImages.botella.src = '/imgs/obstacles/botella-barcelo.png';
 obstacleImages.altavoz.src = '';
 obstacleImages.flamenco.src = '';
 class Obstacle {
-  constructor(ctx, canvasWidth, canvasHeight, road, scale = 1) {
+  constructor(ctx, canvasWidth, canvasHeight, road, scale = 1, obstacleNumber) {
     this.ctx = ctx;
     this.road = road;
-
-    this.baseWidth = 100;
-    this.baseHeight = 256;
     this.scale = scale;
 
     // OBSTACLES TYPES
-    this.obstacleTypes = ["botella", "altavoz", "flamenco"];
+    this.obstacleTypes = ["cubata","flamenco","botella", "altavoz", "maleta", "señal"];
+    this.obstacle = this.obstacleTypes[obstacleNumber];
 
     // Pick random obstacle ***UNCOMMENT WHEN I HAVE THE DESIGNS***
     //const obstalceIndex = Math.floor(Math.random() * this.obstacleType.length);
@@ -27,6 +25,10 @@ class Obstacle {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
 
+    this.baseWidth = 96;
+    this.baseHeight = 171;
+
+    // Initial render size derived from base dimensions and current scale
     this.width = this.baseWidth * this.scale;
     this.height = this.baseHeight * this.scale;
 
@@ -40,7 +42,9 @@ class Obstacle {
 
   setYPosition() {
     // Anchor obstacle so its bottom sits at the vertical midpoint of the road
-    const roadCenterY = this.road
+    // If the road image has not loaded yet (height = 0), fall back to near the canvas bottom
+    const roadReady = this.road && this.road.height > 0;
+    const roadCenterY = roadReady
       ? this.road.y + this.road.height / 2
       : this.canvasHeight - this.height / 2; // fallback: center above canvas bottom
 
@@ -72,14 +76,15 @@ class Obstacle {
   }
 
   draw() {
-    // Collision shape: two rectangles forming a bottle-like hitbox
+    console.log("this is the obstacle we're going to draw", this.obstacle);
+        // Collision shape: two rectangles forming a bottle-like hitbox
     this.ctx.fillRect(this.x, this.y + this.height * 0.4, this.width, this.height * 0.6);
     this.ctx.fillRect(this.x + this.width * 0.25, this.y, this.width * 0.5, this.height * 0.4);
 
     // Visual: paint the sprite on top (collision still uses the rectangles above)
-    if (this.obstacleImage && this.obstacleImage.complete && this.obstacleImage.naturalWidth > 0) {
-      this.ctx.drawImage(this.obstacleImage, this.x, this.y, this.width, this.height);
-    }
+    // if (this.obstacleImage && this.obstacleImage.complete && this.obstacleImage.naturalWidth > 0) {
+    //   this.ctx.drawImage(this.obstacleImage, this.x, this.y, this.width, this.height);
+    // }
 
   }
 }
