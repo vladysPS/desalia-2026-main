@@ -12,8 +12,8 @@ class Obstacle {
     this.ctx = ctx;
     this.road = road;
 
-    this.baseWidth = 45;
-    this.baseHeight = 80;
+    this.baseWidth = 100;
+    this.baseHeight = 256;
     this.scale = scale;
 
     // OBSTACLES TYPES

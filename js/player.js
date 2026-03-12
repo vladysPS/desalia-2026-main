@@ -6,29 +6,29 @@ class Player {
     this.scale = scale;
     this.road = road;
 
-    this.baseWidth = 120;
-    this.baseHeight = 150;
+    this.baseWidth = 191;
+    this.baseHeight = 247;
     this.baseX = 100;
     // Convert original per-frame physics to per-second values (60fps baseline)
     // Acceleration needs fps^2 to keep the same time-to-apex as the old frame-based logic
-    this.baseGravity = 1800; // px/s^2  (0.5 * 60 * 60)
-    this.baseJumpStrength = -900; // px/s (-15 * 60)
+    this.baseGravity = 4000; // px/s^2  (0.5 * 60 * 60)
+    this.baseJumpStrength = -1700; // px/s (-15 * 60)
 
     this.width = this.baseWidth * scale;
     this.height = this.baseHeight * scale;
     this.x = this.baseX * scale;
 
     this.img = new Image();
-    this.img.src = "imgs/skater-sprite-1.png";
+    this.img.src = "imgs/players/pato-1.png";
     this.img.isReady = false;
     this.img.onload = () => (this.img.isReady = true);
-    this.runningHorizontalFrames = 12;
+    this.runningHorizontalFrames = 1;
 
     this.imgJump = new Image();
-    this.imgJump.src = "imgs/jump-sprite.png";
+    this.imgJump.src = "imgs/players/pato-1.png";
     this.imgJump.isReady = false;
     this.imgJump.onload = () => (this.imgJump.isReady = true);
-    this.jumpingHorizontalFrames = 17;
+    this.jumpingHorizontalFrames = 1;
 
     this.verticalFrames = 1;
 

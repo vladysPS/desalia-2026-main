@@ -6,18 +6,19 @@ import Obstacle from './js/obstacle.js';
 class Game {
   constructor(ctx) {
     this.ctx = ctx;
-    this.rafId = undefined; // requestAnimationFrame id
+    this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
     this.todoRectoSinMiedo = false; 
+
     this.baseWidth = 1920;
     this.baseHeight = 1080;
-    this.targetAspect = this.baseWidth / this.baseHeight; // used to scale elements accordingly
+    this.targetAspect = this.baseWidth / this.baseHeight; 
 
     // Speeds expressed in px/s for base scale (scale = 1)
     this.roadBaseSpeed = 1200; 
     this.roadAccelBase = 25;  
-    this.backBaseSpeed = 300;  // 1px per frame at 60fps
+    this.backBaseSpeed = 60;  // 1px per frame at 60fps
 
     // SOUNDS
     this.isThemePlaying = false;
@@ -56,7 +57,7 @@ class Game {
     const canvasContainer = document.getElementById('canvas-container');
     if (!canvasContainer) return;
 
-    const padding = 24; // breathing room around the canvas (all sides)
+    const padding = 14; // breathing room around the canvas (all sides)
     const availableWidth = Math.max(window.innerWidth - padding * 2, 320);
     const availableHeight = Math.max(window.innerHeight - padding * 2, 180);
 
@@ -129,7 +130,7 @@ class Game {
       if (this.checkCollision(this.player, obstacle)) {
         this.hasCollision = true;
 
-        this.stopGame();
+        this.stopGame("lose");
         this.soundCrash.currentTime = 0;
         this.soundCrash.play();
 
@@ -146,7 +147,7 @@ class Game {
     const step = (timestamp) => {
       if (!this.isRunning) return;
 
-      const dt = Math.min((timestamp - this.lastTime) / 1000, 0.05); // seconds, clamp to avoid big jumps
+      const dt = Math.min((timestamp - this.lastTime) / 1000, 0.05); // formula to normalize the seconds between each refresh
       this.lastTime = timestamp;
         
         if (!this.isThemePlaying) {
@@ -197,7 +198,12 @@ class Game {
 
     this.rafId = requestAnimationFrame(step);
   }
-  stopGame() {
+  stopGame(reason) {
+    if (reason === "lose"){
+      console.log("You lost!");
+    } else if (reason === "win"){
+      console.log("You won!");
+    }
     if (!this.isRunning) return;
     cancelAnimationFrame(this.rafId);
     this.rafId = undefined;
@@ -205,8 +211,6 @@ class Game {
 
     this.theme.pause();
     this.isThemePlaying = false;
-
-    console.log('Game Over!');
   }
 }
 
