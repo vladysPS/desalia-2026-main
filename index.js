@@ -9,7 +9,6 @@ const startBtn = document.getElementById('startBtn');
 const poster = document.getElementById('poster');
 const title = document.querySelector('.heading');
 const playerSelector = document.querySelector('.player-selector');
-console.log("the playerselector elemnt", playerSelector);
 
 const playerDivs = document.querySelectorAll('.player-selector .image-container');
 

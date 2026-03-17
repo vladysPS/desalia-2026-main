@@ -6,7 +6,7 @@ class Player {
     this.scale = scale;
     this.road = road;
     this.playerAvatar = avatarNumber;
-    console.log("checking player avatar number", this.playerAvatar);
+
     this.baseWidth = 191;
     this.baseHeight = 247;
     this.baseX = 100;

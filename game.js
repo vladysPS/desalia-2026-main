@@ -3,7 +3,7 @@ import Road from './js/road.js';
 import Player from './js/player.js';
 import Obstacle from './js/obstacle.js';
 import Logo from './js/logo.js';
-
+import Counter from './js/counter.js';
 class Game {
   constructor(ctx, playerAvatar) {
     this.ctx = ctx;
@@ -12,7 +12,6 @@ class Game {
     this.lastTime = 0;
     this.todoRectoSinMiedo = false; 
     this.playerAvatar = playerAvatar;
-    console.log("player avatr inside game", this.playerAvatar);
 
     this.baseWidth = 1920;
     this.baseHeight = 1080;
@@ -47,6 +46,9 @@ class Game {
     this.logo = new Logo(this.ctx,this.canvasWidth, this.scale);
     this.background = new Background(this.ctx, this.canvasHeight, 0, this.backSpeed);
     this.background.game = this; // Pass the current Game instance to the Background so I can stop the game
+
+    this.counter = new Counter(this.ctx, this.canvasWidth, this.canvasHeight);
+    this.score = 0; 
     
     this.road = new Road(this.ctx, this.roadSpeed, this.canvasHeight);
     
@@ -118,6 +120,9 @@ class Game {
     if (this.player && typeof this.player.updateDimensions === 'function') {
       this.player.updateDimensions(this.canvasHeight, this.scale);
     }
+    if (this.counter && typeof this.counter.updateDimensions === 'function') {
+      this.counter.updateDimensions(this.canvasWidth, this.scale);
+    }
     this.obstacles.forEach(obstacle => {
       if (typeof obstacle.updateDimensions === 'function') {
         obstacle.updateDimensions(this.canvasWidth, this.canvasHeight, this.scale, this.road);
@@ -174,10 +179,13 @@ class Game {
         }
 
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        
+      
+      // Increase score (e.g., 10 points per second)
+      this.score += dt * 10;
+
       // accelerate road speed over time
       this.roadSpeed += this.roadAccel * dt;
-        this.road.speed = this.roadSpeed;
+      this.road.speed = this.roadSpeed;
       this.background.move(dt);
       this.background.draw();
       this.road.move(dt);
@@ -185,8 +193,9 @@ class Game {
       this.player.move(dt);
       this.player.draw(dt);
       this.logo.draw();
+      this.counter.draw(this.score);
 
-        // OBSTACLES
+      // OBSTACLES
       this.obstacleTimer += dt;
         if (this.obstacleTimer >= this.obstacleInterval) {
           // Generate random number between 0 and 5 to choose a random obstacle, with more possibilities of the first three 
@@ -225,8 +234,10 @@ class Game {
     } else if (reason === "win"){
       console.log("You won!");
     }
+    console.log(`Final score: ${Math.floor(this.score)}`);
     if (!this.isRunning) return;
     cancelAnimationFrame(this.rafId);
+    this.score = 0;
     this.rafId = undefined;
     this.isRunning = false;
 
