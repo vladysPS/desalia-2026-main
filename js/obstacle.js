@@ -26,9 +26,9 @@ class Obstacle {
     this.obstacleTypes = ["cubata","flamenco","botella", "palmera", "maleta", "señal"];
     this.obstacle = this.obstacleTypes[obstacleNumber];
 
-    this.obstacleImage = obstacleImages["señal"];
+    this.obstacleImage = obstacleImages[this.obstacle];
 
-    switch("señal") {
+    switch(this.obstacle) {
       case "cubata":
       this.baseWidth = 95;
       this.baseHeight = 141;
@@ -207,7 +207,7 @@ class Obstacle {
   }
 
   draw() {
-    switch("señal") {
+    switch(this.obstacle) {
       case "cubata":
       this.ctx.fillStyle = "rgba(0,0,0,0)";
       this.ctx.fillRect(this.x, this.y, this.width, this.height);

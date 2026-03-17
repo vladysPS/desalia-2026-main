@@ -16,7 +16,6 @@ class Logo {
         this.img.src = "imgs/barcelo_desalia-logo.png";
         this.img.isReady = false;
         this.img.onload = () => {
-            console.log("Logo loaded");
             this.img.isReady = true;
         };
         this.img.onerror = () => console.error("Failed to load logo");

@@ -10,17 +10,24 @@ class Game {
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = false; 
+    this.todoRectoSinMiedo = true; 
     this.playerAvatar = playerAvatar;
 
     this.baseWidth = 1920;
     this.baseHeight = 1080;
     this.targetAspect = this.baseWidth / this.baseHeight; 
 
+    // Level logic
+    this.maxLevel = 10;              
+    this.currentLevel = 1;           
+    this.segmentWidth = 0;
+
+    // ROAD AND BACKGROUND BASE SPEEDS
     // Speeds expressed in px/s for base scale (scale = 1)
-    this.roadBaseSpeed = 800; // base 1200 
-    this.roadAccelBase = 25;  // base 25
-    this.backBaseSpeed = 60;  // 1px per frame at 60fps
+    this.roadBaseSpeed = 1200; // base 1200 
+    // delete later:this.roadAccelBase = 25;  // base 25
+    this.backBaseSpeed = 120;  // base 60
+    this.baseObstacleIntervalMs = 2000;
 
     // SOUNDS
     this.isThemePlaying = false;
@@ -40,21 +47,32 @@ class Game {
     this.hasCollision = false;
 
     this.setResponsiveSizes();
-    window.addEventListener('resize', () => {
-      this.setResponsiveSizes();
+      window.addEventListener('resize', () => {
+        this.setResponsiveSizes();
     });
     this.logo = new Logo(this.ctx,this.canvasWidth, this.scale);
-    this.background = new Background(this.ctx, this.canvasHeight, 0, this.backSpeed);
+    this.background = new Background(this.ctx, this.canvasHeight, 0, this.backSpeed, this);
     this.background.game = this; // Pass the current Game instance to the Background so I can stop the game
 
     this.counter = new Counter(this.ctx, this.canvasWidth, this.canvasHeight);
     this.score = 0; 
     
     this.road = new Road(this.ctx, this.roadSpeed, this.canvasHeight);
+        
     
     this.player = null;
 
   }
+  applyLevelUp() {
+    this.roadSpeed = this.roadBaseSpeed * this.scale * (1 + 0.15 * (this.currentLevel - 1));
+    this.backSpeed = this.backBaseSpeed * this.scale * (1 + 0.1 * (this.currentLevel - 1));
+
+    // Decrease obstacle spawn interval – e.g., reduce by 8% per level
+    //const baseInterval = this.getBaseObstacleIntervalMs(); // your original interval for level 1
+    //const multiplier = Math.max(0.4, 1 - 0.08 * (this.currentLevel - 1)); // cap at 40% of original
+    //this.obstacleIntervalMs = baseInterval * multiplier;
+  }
+
   setPlayerAvatar(avatarNumber){
     this.player = new Player(this.ctx, this.canvasHeight, this.soundJump, this.road, this.scale, avatarNumber);
   }
@@ -93,10 +111,10 @@ class Game {
     const scaleRatio = this.scale / previousScale;
     if (this.roadSpeed === undefined) {
       this.roadSpeed = this.roadBaseSpeed * this.scale;
-      this.roadAccel = this.roadAccelBase * this.scale;
+      // delete later: this.roadAccel = this.roadAccelBase * this.scale;
     } else {
       this.roadSpeed *= scaleRatio;
-      this.roadAccel *= scaleRatio;
+      // delete later: this.roadAccel *= scaleRatio;
     }
 
     if (this.backSpeed === undefined) {
@@ -108,7 +126,7 @@ class Game {
     // Propagate new sizes to game elements
     if (this.road && typeof this.road.updateDimensions === 'function') {
       this.road.updateDimensions(this.canvasHeight, this.scale);
-      this.road.speed = this.roadSpeed;
+      // check if we need this: this.road.speed = this.roadSpeed;
     }
     if (this.background && typeof this.background.updateDimensions === 'function') {
       this.background.updateDimensions(this.canvasHeight, this.scale);
@@ -184,7 +202,7 @@ class Game {
       this.score += dt * 10;
 
       // accelerate road speed over time
-      this.roadSpeed += this.roadAccel * dt;
+      // delete later:this.roadSpeed += this.roadAccel * dt;
       this.road.speed = this.roadSpeed;
       this.background.move(dt);
       this.background.draw();
@@ -194,6 +212,27 @@ class Game {
       this.player.draw(dt);
       this.logo.draw();
       this.counter.draw(this.score);
+
+      // CHECKING AND UPDATING THE LEVELS  
+      if (this.background.img.isReady && this.segmentWidth === 0) {
+          this.segmentWidth = (this.background.img.width * this.scale) / this.maxLevel;
+          
+          console.log("Segment width initialized:", this.segmentWidth);
+          console.log("Total width scaled:", this.background.img.width * this.scale);
+      }
+
+      const distance = -this.background.x;  // positive pixels scrolled
+      // Check if we've crossed into a new level (but not beyond max)
+      if (this.currentLevel < this.maxLevel && 
+          distance >= this.segmentWidth * this.currentLevel) {
+          
+          this.currentLevel++;
+          this.applyLevelUp();  
+          console.log("Level up! Current level:", this.currentLevel);
+          console.log("Current road speed:", this.road.speed);
+          console.log("Current background speed:", this.background.speed);
+          //this.showLevelBanner(this.currentLevel); 
+      }
 
       // OBSTACLES
       this.obstacleTimer += dt;
