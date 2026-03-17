@@ -5,12 +5,14 @@ import Obstacle from './js/obstacle.js';
 import Logo from './js/logo.js';
 
 class Game {
-  constructor(ctx) {
+  constructor(ctx, playerAvatar) {
     this.ctx = ctx;
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
     this.todoRectoSinMiedo = false; 
+    this.playerAvatar = playerAvatar;
+    console.log("player avatr inside game", this.playerAvatar);
 
     this.baseWidth = 1920;
     this.baseHeight = 1080;
@@ -48,8 +50,11 @@ class Game {
     
     this.road = new Road(this.ctx, this.roadSpeed, this.canvasHeight);
     
-    this.player = new Player(this.ctx, this.canvasHeight, this.soundJump, this.road, this.scale);
+    this.player = null;
 
+  }
+  setPlayerAvatar(avatarNumber){
+    this.player = new Player(this.ctx, this.canvasHeight, this.soundJump, this.road, this.scale, avatarNumber);
   }
   getRandomObstacleTime() {
     return 1 + Math.random() * 2; // between 1s and 3s
@@ -173,7 +178,6 @@ class Game {
       // accelerate road speed over time
       this.roadSpeed += this.roadAccel * dt;
         this.road.speed = this.roadSpeed;
-        
       this.background.move(dt);
       this.background.draw();
       this.road.move(dt);
