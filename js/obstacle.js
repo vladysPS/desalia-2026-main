@@ -26,9 +26,9 @@ class Obstacle {
     this.obstacleTypes = ["cubata","flamenco","botella", "palmera", "maleta", "señal"];
     this.obstacle = this.obstacleTypes[obstacleNumber];
 
-    this.obstacleImage = obstacleImages[this.obstacle];
+    this.obstacleImage = obstacleImages["maleta"];
 
-    switch(this.obstacle) {
+    switch("maleta") {
       case "cubata":
       this.baseWidth = 95;
       this.baseHeight = 141;
@@ -76,7 +76,13 @@ class Obstacle {
     this.isOffscreen = false;
   }
 
+  // This method is for reating a better illusion of collision, so there are no cases it feels like you collided with empty space
+  getInsetAmount() {
+    return 12 * this.scale;
+  }
+
   getCollisionRectangles() {
+    const inset = this.getInsetAmount();
     const rectangles = [];
   
     switch(this.obstacle) {
@@ -84,78 +90,78 @@ class Obstacle {
       case "palmera":
         // Single rectangle obstacles
         rectangles.push({
-          x: this.x,
-          y: this.y,
-          width: this.width,
-          height: this.height
+          x: this.x + inset,
+          y: this.y + inset,
+          width: this.width  - inset * 2,
+          height: this.height  - inset * 2
         });
         break;
         
       case "flamenco":
         // Bottom rectangle
         rectangles.push({
-          x: this.x,
-          y: this.y + this.height * 0.4,
-          width: this.width,
-          height: this.height * 0.6
+          x: this.x + inset,
+          y: this.y + this.height * 0.4 + inset,
+          width: this.width - inset * 2,
+          height: this.height * 0.6 - inset * 2
         });
         // Top rectangle
         rectangles.push({
-          x: this.x + this.width - this.width * 0.4,
-          y: this.y,
-          width: this.width * 0.4,
-          height: this.height * 0.648
+          x: this.x + this.width - this.width * 0.4 + inset,
+          y: this.y + inset,
+          width: this.width * 0.4 - inset * 2,
+          height: this.height * 0.648 - inset * 2
         });
         break;
         
       case "botella":
         // Bottom rectangle
         rectangles.push({
-          x: this.x,
-          y: this.y + this.height * 0.4,
-          width: this.width,
-          height: this.height * 0.6
+          x: this.x + inset,
+          y: this.y + this.height * 0.4 + inset,
+          width: this.width - inset * 2,
+          height: this.height * 0.6 - inset * 2
         });
         // Top rectangle
         rectangles.push({
-          x: this.x + this.width * 0.25,
-          y: this.y,
-          width: this.width * 0.5,
-          height: this.height * 0.4
+          x: this.x + this.width * 0.25 + inset,
+          y: this.y + inset,
+          width: this.width * 0.5 - inset * 2,
+          height: this.height * 0.4 - inset * 2
         });
         break;
         
       case "maleta":
         // Main body
         rectangles.push({
-          x: this.x,
-          y: this.y + this.height * 0.28,
-          width: this.width,
-          height: this.height * 0.7
+          x: this.x + inset,
+          y: this.y + this.height * 0.28 + inset,
+          width: this.width - inset * 2,
+          height: this.height * 0.7 - inset * 2
         });
         // Top handle
         rectangles.push({
-          x: this.x + this.width * 0.272,
-          y: this.y,
-          width: this.width * 0.45,
-          height: this.height * 0.28
+          x: this.x + this.width * 0.272 + inset,
+          y: this.y + inset,
+          width: this.width * 0.45 - inset * 2,
+          height: this.height * 0.28 - inset * 2
         });
         break;
         
       case "señal":
         // Main sign
         rectangles.push({
-          x: this.x,
-          y: this.y + this.height * 0.22,
-          width: this.width,
-          height: this.height * 0.76
+          x: this.x + inset,
+          y: this.y + this.height * 0.22 + inset,
+          width: this.width - inset * 2,
+          height: this.height * 0.76 - inset * 2
         });
         // Post/top
         rectangles.push({
-          x: this.x + this.width * 0.41,
-          y: this.y,
-          width: this.width * 0.21,
-          height: this.height * 0.22
+          x: this.x + this.width * 0.41 + inset,
+          y: this.y + inset,
+          width: this.width * 0.21 - inset * 2, 
+          height: this.height * 0.22 - inset * 2
         });
         break;
         
@@ -201,7 +207,7 @@ class Obstacle {
   }
 
   draw() {
-    switch(this.obstacle) {
+    switch("maleta") {
       case "cubata":
       this.ctx.fillStyle = "rgba(0,0,0,0)";
       this.ctx.fillRect(this.x, this.y, this.width, this.height);

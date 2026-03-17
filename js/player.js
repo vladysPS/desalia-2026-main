@@ -11,8 +11,8 @@ class Player {
     this.baseX = 100;
     // Convert original per-frame physics to per-second values (60fps baseline)
     // Acceleration needs fps^2 to keep the same time-to-apex as the old frame-based logic
-    this.baseGravity = 4100; // px/s^2  (0.5 * 60 * 60)
-    this.baseJumpStrength = -1900; // px/s (-15 * 60)
+    this.baseGravity = 4600; // px/s^2  (0.5 * 60 * 60)
+    this.baseJumpStrength = -2000; // px/s (-15 * 60)
 
     this.width = this.baseWidth * scale;
     this.height = this.baseHeight * scale;
