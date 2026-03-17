@@ -10,14 +10,14 @@ class Game {
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = true; 
+    this.todoRectoSinMiedo = false; 
 
     this.baseWidth = 1920;
     this.baseHeight = 1080;
     this.targetAspect = this.baseWidth / this.baseHeight; 
 
     // Speeds expressed in px/s for base scale (scale = 1)
-    this.roadBaseSpeed = 1200; // base 1200 
+    this.roadBaseSpeed = 800; // base 1200 
     this.roadAccelBase = 25;  // base 25
     this.backBaseSpeed = 60;  // 1px per frame at 60fps
 
@@ -119,13 +119,19 @@ class Game {
       }
     });
   }
-  checkCollision(a, b) {
-    return (
-      a.x < b.x + b.width &&
-      a.x + a.width > b.x &&
-      a.y < b.y + b.height &&
-      a.y + a.height > b.y
-    );
+  checkCollision(player, obstacle) {
+    // Get all collision rectangles from the obstacle
+    const collisionRects = obstacle.getCollisionRectangles();
+    // Check collision with any of the obstacle's rectangles
+    for (const rect of collisionRects) {
+      if (player.x < rect.x + rect.width &&
+          player.x + player.width > rect.x &&
+          player.y < rect.y + rect.height &&
+          player.y + player.height > rect.y) {
+        return true; 
+      }
+    }
+    return false; 
   }
   collisions() {
     if (this.hasCollision) return;
@@ -181,12 +187,8 @@ class Game {
         if (this.obstacleTimer >= this.obstacleInterval) {
           // Generate random number between 0 and 5 to choose a random obstacle, with more possibilities of the first three 
           const obstacleNumber = (() => {
-            const r = Math.random();
-            return r < 0.8             // 80% chance
-              ? Math.floor(Math.random() * 4)   // 0–3
-              : 4 + Math.floor(Math.random() * 2); // 20% chance → 4 or 5
+            return Math.floor(Math.random() * 6);
           })();
-
 
           this.obstacles.push(
             new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale, obstacleNumber)
