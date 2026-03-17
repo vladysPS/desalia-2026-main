@@ -1,10 +1,11 @@
 class Player {
-  constructor(ctx, canvasHeight, soundJump, road, scale = 1) {
+  constructor(ctx, canvasHeight, soundJump, road, scale = 1, avatarNumber) {
     this.ctx = ctx;
 
     this.canvasHeight = canvasHeight;
     this.scale = scale;
     this.road = road;
+    this.playerAvatar = avatarNumber;
 
     this.baseWidth = 191;
     this.baseHeight = 247;
@@ -19,13 +20,13 @@ class Player {
     this.x = this.baseX * scale;
 
     this.img = new Image();
-    this.img.src = "imgs/players/pato-1.png";
+    this.img.src = `imgs/players/pato-${this.playerAvatar}.png`;
     this.img.isReady = false;
     this.img.onload = () => (this.img.isReady = true);
     this.runningHorizontalFrames = 1;
 
     this.imgJump = new Image();
-    this.imgJump.src = "imgs/players/pato-1.png";
+    this.imgJump.src = `imgs/players/pato-${this.playerAvatar}.png`;
     this.imgJump.isReady = false;
     this.imgJump.onload = () => (this.imgJump.isReady = true);
     this.jumpingHorizontalFrames = 1;

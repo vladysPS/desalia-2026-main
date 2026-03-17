@@ -1,11 +1,39 @@
+/* MAIN */
 body {
   margin: 0;
 }
 
 .hidden {
   display: none;
+} 
+
+/* FONTS */
+@font-face {
+  font-family: 'Knockout';
+  src: url('fonts/Knockout-91.woff2') format('woff2'),
+    url('fonts/Knockout-91.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 
+@font-face {
+  font-family: 'OSD-mono';
+  src: url('fonts/OSD-mono.woff') format('woff2'),
+    url('fonts/OSD-mono.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.knockout {
+  font-family: 'Knockout';
+}
+
+.OSD-mono{
+  font-family: 'OSD-mono';
+  text-transform: uppercase;
+}
+
+/* GAME STYLES */
 .game-main-section {
   display: flex;
   justify-content: center;
@@ -28,20 +56,68 @@ body {
   aspect-ratio: 16 / 9;
   max-width: 100vw;
   max-height: 100vh;
+  .heading{
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    z-index: 90;
+    h1{
+      margin:0;
+      font-weight: 410;
+      font-size: 15px;
+    }
+  }
+  .player-selector{
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap:20px;
+    top:25%;
+    z-index: 90;
+    .image-container{
+      cursor: pointer;
+      width: 15%;
+      height: auto;
+      transition: transform 0.3s ease;
+      img{
+        width: 100%;
+        height: auto;
+      }
+    }
+    .image-container:hover{
+      transform: scale(1.05);
+    }
+  }
+  #startBtn {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -25%);
+  padding: 15px 30px;
+  background:black;
+  color:white;
+  font-size:20px;
+  text-decoration: none;
+  border-radius: 20px;
+  }
+  #startBtn:hover{
+    background: #04d1c8;
+  }
+  .selected{
+    transform: scale(1.05);
+    background: red;
+  }
+  
 }
 
 #poster {
   position: absolute;
   inset: 0;
-  background: #e3894c;
-}
-
-#startBtn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 1;
-  transform: translate(-50%, -50%);
+  background: #FFD2B4;
 }
 
 #startBtn img {
@@ -66,6 +142,43 @@ canvas {
     border-radius: 30px;
     border: 2px solid rgb(0, 42, 70);
     box-shadow: -5px 5px 0 0 rgb(0, 42, 70);
+    .heading{
+      h1{
+        font-weight: 410;
+        font-size: 50px;
+      }
+    }
+    .player-selector{
+      position: absolute;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap:20px;
+      top:25%;
+      z-index: 90;
+      .image-container{
+        width: 15%;
+        height: auto;
+        img{
+          width: 100%;
+          height: auto;
+        }
+      }
+    }
+    #startBtn {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    padding: 15px 30px;
+    background:black;
+    color:white;
+    font-size:40px;
+    text-decoration: none;
+    border-radius: 20px;
+    }
   }
 
   #startBtn img {
