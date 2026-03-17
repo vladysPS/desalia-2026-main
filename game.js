@@ -2,6 +2,7 @@ import Background from './js/background.js';
 import Road from './js/road.js';
 import Player from './js/player.js';
 import Obstacle from './js/obstacle.js';
+import Logo from './js/logo.js';
 
 class Game {
   constructor(ctx) {
@@ -16,8 +17,8 @@ class Game {
     this.targetAspect = this.baseWidth / this.baseHeight; 
 
     // Speeds expressed in px/s for base scale (scale = 1)
-    this.roadBaseSpeed = 1200; 
-    this.roadAccelBase = 25;  
+    this.roadBaseSpeed = 1200; // base 1200 
+    this.roadAccelBase = 25;  // base 25
     this.backBaseSpeed = 60;  // 1px per frame at 60fps
 
     // SOUNDS
@@ -41,13 +42,14 @@ class Game {
     window.addEventListener('resize', () => {
       this.setResponsiveSizes();
     });
- 
+    this.logo = new Logo(this.ctx,this.canvasWidth, this.scale);
     this.background = new Background(this.ctx, this.canvasHeight, 0, this.backSpeed);
     this.background.game = this; // Pass the current Game instance to the Background so I can stop the game
     
     this.road = new Road(this.ctx, this.roadSpeed, this.canvasHeight);
     
     this.player = new Player(this.ctx, this.canvasHeight, this.soundJump, this.road, this.scale);
+
   }
   getRandomObstacleTime() {
     return 1 + Math.random() * 2; // between 1s and 3s
@@ -104,6 +106,9 @@ class Game {
     if (this.background && typeof this.background.updateDimensions === 'function') {
       this.background.updateDimensions(this.canvasHeight, this.scale);
       this.background.speed = this.backSpeed;
+    }
+    if (this.logo && typeof this.logo.updateDimensions === 'function') {
+      this.logo.updateDimensions(this.canvasWidth, this.scale);
     }
     if (this.player && typeof this.player.updateDimensions === 'function') {
       this.player.updateDimensions(this.canvasHeight, this.scale);
@@ -164,11 +169,12 @@ class Game {
         this.road.speed = this.roadSpeed;
         
       this.background.move(dt);
-        this.background.draw();
+      this.background.draw();
       this.road.move(dt);
-        this.road.draw();
+      this.road.draw();
       this.player.move(dt);
       this.player.draw(dt);
+      this.logo.draw();
 
         // OBSTACLES
       this.obstacleTimer += dt;

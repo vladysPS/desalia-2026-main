@@ -1,6 +1,6 @@
 class Background {
   constructor(ctx, imgHeight, initialX, speed) {
-    this.imgSrc = "imgs/background/background-test.png";
+    this.imgSrc = "imgs/background/background-game.png";
     this.speed = speed;
 
     this.ctx = ctx;
