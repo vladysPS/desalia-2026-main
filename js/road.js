@@ -7,7 +7,7 @@ class Road {
     this.width = this.ctx.canvas.width;
     this.height = 0;
     this.y = 0;
-    this.offset = 80;
+    this.offset = 0.2;
 
     this.img = new Image();
     this.img.src = "imgs/camino-desalia-2.png";
@@ -17,7 +17,7 @@ class Road {
       this.img.isReady = true;
       const aspectRatio = this.img.naturalHeight / this.img.naturalWidth;
       this.height = this.width * aspectRatio;
-      this.y = this.canvasHeight - this.height - this.offset;
+      this.y = this.canvasHeight - this.height - (this.offset * this.height);
     };
   }
 

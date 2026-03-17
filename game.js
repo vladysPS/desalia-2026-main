@@ -2,6 +2,7 @@ import Background from './js/background.js';
 import Road from './js/road.js';
 import Player from './js/player.js';
 import Obstacle from './js/obstacle.js';
+import Logo from './js/logo.js';
 
 class Game {
   constructor(ctx) {
@@ -9,15 +10,15 @@ class Game {
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = false; 
+    this.todoRectoSinMiedo = true; 
 
     this.baseWidth = 1920;
     this.baseHeight = 1080;
     this.targetAspect = this.baseWidth / this.baseHeight; 
 
     // Speeds expressed in px/s for base scale (scale = 1)
-    this.roadBaseSpeed = 1200; 
-    this.roadAccelBase = 25;  
+    this.roadBaseSpeed = 1200; // base 1200 
+    this.roadAccelBase = 25;  // base 25
     this.backBaseSpeed = 60;  // 1px per frame at 60fps
 
     // SOUNDS
@@ -41,13 +42,14 @@ class Game {
     window.addEventListener('resize', () => {
       this.setResponsiveSizes();
     });
- 
+    this.logo = new Logo(this.ctx,this.canvasWidth, this.scale);
     this.background = new Background(this.ctx, this.canvasHeight, 0, this.backSpeed);
     this.background.game = this; // Pass the current Game instance to the Background so I can stop the game
     
     this.road = new Road(this.ctx, this.roadSpeed, this.canvasHeight);
     
     this.player = new Player(this.ctx, this.canvasHeight, this.soundJump, this.road, this.scale);
+
   }
   getRandomObstacleTime() {
     return 1 + Math.random() * 2; // between 1s and 3s
@@ -104,6 +106,9 @@ class Game {
     if (this.background && typeof this.background.updateDimensions === 'function') {
       this.background.updateDimensions(this.canvasHeight, this.scale);
       this.background.speed = this.backSpeed;
+    }
+    if (this.logo && typeof this.logo.updateDimensions === 'function') {
+      this.logo.updateDimensions(this.canvasWidth, this.scale);
     }
     if (this.player && typeof this.player.updateDimensions === 'function') {
       this.player.updateDimensions(this.canvasHeight, this.scale);
@@ -164,17 +169,27 @@ class Game {
         this.road.speed = this.roadSpeed;
         
       this.background.move(dt);
-        this.background.draw();
+      this.background.draw();
       this.road.move(dt);
-        this.road.draw();
+      this.road.draw();
       this.player.move(dt);
       this.player.draw(dt);
+      this.logo.draw();
 
         // OBSTACLES
       this.obstacleTimer += dt;
         if (this.obstacleTimer >= this.obstacleInterval) {
+          // Generate random number between 0 and 5 to choose a random obstacle, with more possibilities of the first three 
+          const obstacleNumber = (() => {
+            const r = Math.random();
+            return r < 0.8             // 80% chance
+              ? Math.floor(Math.random() * 4)   // 0–3
+              : 4 + Math.floor(Math.random() * 2); // 20% chance → 4 or 5
+          })();
+
+
           this.obstacles.push(
-            new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale)
+            new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale, obstacleNumber)
           );
           this.obstacleTimer = 0;
           this.obstacleInterval = this.getRandomObstacleTime();
