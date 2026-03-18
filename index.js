@@ -18,8 +18,6 @@ playerDivs.forEach(div => {
       playerDivs.forEach(d => d.classList.remove('selected'));
       playerAvatar = div.dataset.duckNumber;
       div.classList.add('selected');
-      console.log(`Duck number selected: ${playerAvatar}`);
-    
   });
 });
 
