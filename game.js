@@ -11,7 +11,7 @@ class Game {
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = true; 
+    this.todoRectoSinMiedo = false; 
     this.playerAvatar = playerAvatar;
 
     this.baseWidth = 1920;
@@ -123,7 +123,6 @@ class Game {
     if (Math.random() < bonusChance) {
       const bonusMultiplier = 1.5 + Math.random() * 1.5; // 1.5–3x
       interval *= bonusMultiplier;
-      console.log(`Bonus gap! Interval increased: ${interval.toFixed(2)}s`);
     }
 
     return interval;
@@ -270,9 +269,6 @@ class Game {
       // CHECKING AND UPDATING THE LEVELS  
       if (this.background.img.isReady && this.segmentWidth === 0) {
           this.segmentWidth = (this.background.img.width * this.scale) / this.maxLevel;
-          
-          console.log("Segment width initialized:", this.segmentWidth);
-          console.log("Total width scaled:", this.background.img.width * this.scale);
       }
 
       const distance = -this.background.x;  // positive pixels scrolled
@@ -283,9 +279,6 @@ class Game {
           this.currentLevel++;
           this.applyLevelUp();
           this.levels.img.src = `imgs/levels/level-${this.currentLevel}.png`;
-          console.log("Level up! Current level:", this.currentLevel);
-          console.log("Current road speed:", this.road.speed);
-          console.log("Current background speed:", this.background.speed);
           //this.showLevelBanner(this.currentLevel); 
       }
 
