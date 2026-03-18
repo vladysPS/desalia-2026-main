@@ -10,7 +10,7 @@ class Game {
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = true; 
+    this.todoRectoSinMiedo = false; 
     this.playerAvatar = playerAvatar;
 
     this.baseWidth = 1920;
