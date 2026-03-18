@@ -14,33 +14,57 @@
      <!-- canvas -->
     <canvas id="" width="360" height="640"></canvas>
     
-    <div class="heading knockout">
-      <h1>ELIGE TU AVATAR</h1>
+    <div class="initial-game-container">
+      <div class="heading knockout">
+        <h1>ELIGE TU AVATAR</h1>
+      </div>
+      <div class="player-selector">
+        <div class="image-container" data-duck-number="1">
+          <img src="/imgs/players/pato-1.png" class="pato-1" alt="desalia-duck-1">
+        </div>
+        <div class="image-container" data-duck-number="2">
+          <img src="/imgs/players/pato-2.png" class="pato-2" alt="desalia-duck-2">
+        </div>
+        <div class="image-container" data-duck-number="3">
+          <img src="/imgs/players/pato-3.png" class="pato-3" alt="desalia-duck-3">
+        </div>
+        <div class="image-container" data-duck-number="4">
+          <img src="/imgs/players/pato-4.png" class="pato-4" alt="desalia-duck-4">
+        </div>
+        <div class="image-container" data-duck-number="5">
+          <img src="/imgs/players/pato-5.png" class="pato-5" alt="desalia-duck-5">
+        </div>
+      </div>
+      <!-- start btn -->
+      <a href="#" class="OSD-mono" id="startBtn">
+        START GAME
+      </a>
     </div>
 
-    <div class="player-selector">
-      <div class="image-container" data-duck-number="1">
-        <img src="/imgs/players/pato-1.png" class="pato-1" alt="desalia-duck-1">
-      </div>
-      <div class="image-container" data-duck-number="2">
-        <img src="/imgs/players/pato-2.png" class="pato-2" alt="desalia-duck-2">
-      </div>
-      <div class="image-container" data-duck-number="3">
-        <img src="/imgs/players/pato-3.png" class="pato-3" alt="desalia-duck-3">
-      </div>
-      <div class="image-container" data-duck-number="4">
-        <img src="/imgs/players/pato-4.png" class="pato-4" alt="desalia-duck-4">
-      </div>
-      <div class="image-container" data-duck-number="5">
-        <img src="/imgs/players/pato-5.png" class="pato-5" alt="desalia-duck-5">
-      </div>
+    <div class="game-over">
+      <h2>GAME OVER</h2>
+      <p>TU PUNTUACIÓN:</p>
+      <div>0000</div>
+      <button>
+        <p>pulsa al pato</p>
+        <div>pato</div>
+        <p>para seguir</p>
+      </button>
     </div>
-   
 
-    <!-- start btn -->
-    <a href="#" class="OSD-mono" id="startBtn">
-      START GAME
-    </a>
+    <div class="restart-lost">
+      <h2>NEW SCORE</h2>
+      <p>Acabas de participar para ganar un pase triple a DESALIA.</p>
+      <p>Has llegado al nivel 2</p>
+      <button>PLAY AGAIN</button>
+    </div>
+
+    <div class="restart-win">
+      <h2>NEW SCORE</h2>
+      <p>Te has pasado el juego. ¡Ser un viciado tiene premio!</p>
+      <p>Ahora tienes más posibilidades de ganar tu pase a Desalia, y cuantas más partidas juegues, más posibilidades tienes de ganar tu pase.</p>
+      <button>PLAY AGAIN</button>
+    </div>
 
     <!-- image background  -->
     <div id="poster" alt="poster"></div>
