@@ -8,7 +8,6 @@ class Levels {
         
         this.width = this.baseWidth * this.scale;
         this.height = this.baseHeight * this.scale;
-        console.log("this is the canvas height: " + canvasHeight);
 
         const padding = 40;
         this.x = canvasWidth - this.width - (padding * this.scale);
