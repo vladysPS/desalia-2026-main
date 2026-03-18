@@ -4,13 +4,14 @@ import Player from './js/player.js';
 import Obstacle from './js/obstacle.js';
 import Logo from './js/logo.js';
 import Counter from './js/counter.js';
+import Levels from './js/levels.js';
 class Game {
   constructor(ctx, playerAvatar) {
     this.ctx = ctx;
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = false; 
+    this.todoRectoSinMiedo = true; 
     this.playerAvatar = playerAvatar;
 
     this.baseWidth = 1920;
@@ -24,7 +25,7 @@ class Game {
 
     // ROAD AND BACKGROUND BASE SPEEDS
     // Speeds expressed in px/s for base scale (scale = 1)
-    this.roadBaseSpeed = 1200; // base 1200 
+    this.roadBaseSpeed = 1600; // base 1600 
     // delete later:this.roadAccelBase = 25;  // base 25
     this.backBaseSpeed = 120;  // base 60
     this.baseObstacleIntervalMs = 2000;
@@ -43,7 +44,7 @@ class Game {
     // OBSTACLES
     this.obstacles = [];
     this.obstacleTimer = 0; // seconds
-    this.obstacleInterval = this.getRandomObstacleTime(); // seconds
+    // OLD TIME: this.obstacleInterval = this.getRandomObstacleTime(); // seconds
     this.hasCollision = false;
 
     this.setResponsiveSizes();
@@ -51,6 +52,7 @@ class Game {
         this.setResponsiveSizes();
     });
     this.logo = new Logo(this.ctx,this.canvasWidth, this.scale);
+    this.levels = new Levels(this.ctx, this.canvasWidth, this.canvasHeight, this.scale);
     this.background = new Background(this.ctx, this.canvasHeight, 0, this.backSpeed, this);
     this.background.game = this; // Pass the current Game instance to the Background so I can stop the game
 
@@ -64,21 +66,69 @@ class Game {
 
   }
   applyLevelUp() {
-    this.roadSpeed = this.roadBaseSpeed * this.scale * (1 + 0.15 * (this.currentLevel - 1));
-    this.backSpeed = this.backBaseSpeed * this.scale * (1 + 0.1 * (this.currentLevel - 1));
+    this.roadSpeed = this.roadBaseSpeed * this.scale * (1 + 0.08 * (this.currentLevel - 1));
+    this.backSpeed = this.backBaseSpeed * this.scale * (1 + 0.05 * (this.currentLevel - 1));
 
-    // Decrease obstacle spawn interval – e.g., reduce by 8% per level
-    //const baseInterval = this.getBaseObstacleIntervalMs(); // your original interval for level 1
-    //const multiplier = Math.max(0.4, 1 - 0.08 * (this.currentLevel - 1)); // cap at 40% of original
-    //this.obstacleIntervalMs = baseInterval * multiplier;
+    // OLD TIME this.obstacleInterval = this.getRandomObstacleTime(this.currentLevel);
   }
 
   setPlayerAvatar(avatarNumber){
     this.player = new Player(this.ctx, this.canvasHeight, this.soundJump, this.road, this.scale, avatarNumber);
+
+    // Initialize the first obstacle interval now that player exists
+    const randomType = Math.floor(Math.random() * 6);
+    const firstObstacle = new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale, randomType);
+    this.obstacleInterval = this.getNextObstacleInterval(firstObstacle);
   }
-  getRandomObstacleTime() {
-    return 1 + Math.random() * 2; // between 1s and 3s
+  // OLD TIME getRandomObstacleTime(level = this.currentLevel) {
+  //   const baseMin = 0.8; 
+  //   const baseMax = 1.7;   
+
+  //   // exponential difficulty: harder levels spawn faster
+  //   const factor = Math.pow(0.85, level - 1); 
+  //   const minInterval = Math.max(0.4, baseMin * factor);
+  //   const maxInterval = Math.max(0.6, baseMax * factor);
+
+  //   // ensure minimum time for player to react
+  //   const minSafe = 0.5; 
+  //   return Math.max(minSafe, minInterval + Math.random() * (maxInterval - minInterval));
+  // }
+  getNextObstacleInterval(obstacle) {
+    // Player jump physics
+    const jumpDuration = 2 * Math.abs(this.player.jumpStrength) / this.player.gravity;
+    const jumpDistance = this.road.speed * jumpDuration;
+
+    // Base minimum distance between obstacles
+    const buffer = 20; // pixels
+    const minDistance = jumpDistance + obstacle.width + buffer;
+
+    // Base interval in seconds
+    let interval = minDistance / this.road.speed;
+
+    // Non-linear difficulty scaling
+    // Exponential decay: early levels easy, last 3 levels very tight
+    const decayBase = 0.85; // smaller = faster decay, more difficult early
+    const levelFactor = Math.pow(decayBase, this.currentLevel - 1);
+    interval *= levelFactor;
+
+    // Random variation for natural feel
+    interval *= 0.85 + Math.random() * 0.3;
+
+    // Clamp to ensure player can always jump
+    const minSafeInterval = jumpDuration * 1.05; // slightly above jump distance
+    interval = Math.max(interval, minSafeInterval);
+
+    // Occasional “bonus gap”
+    const bonusChance = 0.15; // 15% of obstacles
+    if (Math.random() < bonusChance) {
+      const bonusMultiplier = 1.5 + Math.random() * 1.5; // 1.5–3x
+      interval *= bonusMultiplier;
+      console.log(`Bonus gap! Interval increased: ${interval.toFixed(2)}s`);
+    }
+
+    return interval;
   }
+
   setResponsiveSizes() {
     const previousScale = this.scale || 1;
     const canvasContainer = document.getElementById('canvas-container');
@@ -134,6 +184,9 @@ class Game {
     }
     if (this.logo && typeof this.logo.updateDimensions === 'function') {
       this.logo.updateDimensions(this.canvasWidth, this.scale);
+    }
+    if (this.levels && typeof this.levels.updateDimensions === 'function') {
+      this.levels.updateDimensions(this.canvasWidth, this.canvasHeight, this.scale);
     }
     if (this.player && typeof this.player.updateDimensions === 'function') {
       this.player.updateDimensions(this.canvasHeight, this.scale);
@@ -211,6 +264,7 @@ class Game {
       this.player.move(dt);
       this.player.draw(dt);
       this.logo.draw();
+      this.levels.draw();
       this.counter.draw(this.score);
 
       // CHECKING AND UPDATING THE LEVELS  
@@ -227,7 +281,8 @@ class Game {
           distance >= this.segmentWidth * this.currentLevel) {
           
           this.currentLevel++;
-          this.applyLevelUp();  
+          this.applyLevelUp();
+          this.levels.img.src = `imgs/levels/level-${this.currentLevel}.png`;
           console.log("Level up! Current level:", this.currentLevel);
           console.log("Current road speed:", this.road.speed);
           console.log("Current background speed:", this.background.speed);
@@ -242,11 +297,15 @@ class Game {
             return Math.floor(Math.random() * 6);
           })();
 
-          this.obstacles.push(
-            new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale, obstacleNumber)
-          );
+          // OLD: this.obstacles.push(
+          //   new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale, obstacleNumber)
+          // );
+          // OLD :this.obstacleInterval = this.getRandomObstacleTime(this.currentLevel);
+          const newObstacle = new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale, obstacleNumber);
+          this.obstacles.push(newObstacle);
+
           this.obstacleTimer = 0;
-          this.obstacleInterval = this.getRandomObstacleTime();
+          this.obstacleInterval = this.getNextObstacleInterval(newObstacle);
         }
 
         this.obstacles.forEach(obstacle => {
