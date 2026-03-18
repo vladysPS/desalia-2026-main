@@ -90,6 +90,9 @@ body {
     .image-container:hover{
       transform: scale(1.05);
     }
+    .image-container.selected:hover{
+      transform: scale(1.19);
+    }
   }
   #startBtn {
   position: absolute;
@@ -108,8 +111,11 @@ body {
     background: #04d1c8;
   }
   .selected{
-    transform: scale(1.05);
-    background: red;
+    transform: scale(1.19);
+    background:url("imgs/selected-background.png");
+        background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
   }
   
 }

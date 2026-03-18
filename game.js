@@ -4,13 +4,14 @@ import Player from './js/player.js';
 import Obstacle from './js/obstacle.js';
 import Logo from './js/logo.js';
 import Counter from './js/counter.js';
+import Levels from './js/levels.js';
 class Game {
   constructor(ctx, playerAvatar) {
     this.ctx = ctx;
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = false; 
+    this.todoRectoSinMiedo = true; 
     this.playerAvatar = playerAvatar;
 
     this.baseWidth = 1920;
@@ -51,9 +52,11 @@ class Game {
         this.setResponsiveSizes();
     });
     this.logo = new Logo(this.ctx,this.canvasWidth, this.scale);
+    this.levels = new Levels(this.ctx, this.canvasWidth, this.canvasHeight, this.scale);
     this.background = new Background(this.ctx, this.canvasHeight, 0, this.backSpeed, this);
     this.background.game = this; // Pass the current Game instance to the Background so I can stop the game
 
+    console.log("this is the canvas height: in game" + this.canvasHeight);
     this.counter = new Counter(this.ctx, this.canvasWidth, this.canvasHeight);
     this.score = 0; 
     
@@ -135,6 +138,9 @@ class Game {
     if (this.logo && typeof this.logo.updateDimensions === 'function') {
       this.logo.updateDimensions(this.canvasWidth, this.scale);
     }
+    if (this.levels && typeof this.levels.updateDimensions === 'function') {
+      this.levels.updateDimensions(this.canvasWidth, this.canvasHeight, this.scale);
+    }
     if (this.player && typeof this.player.updateDimensions === 'function') {
       this.player.updateDimensions(this.canvasHeight, this.scale);
     }
@@ -211,6 +217,7 @@ class Game {
       this.player.move(dt);
       this.player.draw(dt);
       this.logo.draw();
+      this.levels.draw();
       this.counter.draw(this.score);
 
       // CHECKING AND UPDATING THE LEVELS  
@@ -227,7 +234,8 @@ class Game {
           distance >= this.segmentWidth * this.currentLevel) {
           
           this.currentLevel++;
-          this.applyLevelUp();  
+          this.applyLevelUp();
+          this.levels.img.src = `imgs/levels/level-${this.currentLevel}.png`;
           console.log("Level up! Current level:", this.currentLevel);
           console.log("Current road speed:", this.road.speed);
           console.log("Current background speed:", this.background.speed);
