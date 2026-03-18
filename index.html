@@ -41,29 +41,31 @@
       </a>
     </div>
 
-    <div class="game-over">
-      <h2>GAME OVER</h2>
-      <p>TU PUNTUACIÓN:</p>
-      <div>0000</div>
-      <button>
-        <p>pulsa al pato</p>
-        <div>pato</div>
-        <p>para seguir</p>
+    <div class="game-over hidden">
+      <h2 class="OSD-mono">GAME OVER</h2>
+      <p class="knockout">TU PUNTUACIÓN:</p>
+      <div class="game-score OSD-mono">0000</div>
+      <button class="knockout game-over-button">
+        <span>pulsa al pato</span>
+        <div class="pato-container">
+          <img src="imgs/button-pato.png" alt="">
+        </div>
+        <span>para seguir</span>
       </button>
     </div>
 
-    <div class="restart-lost">
-      <h2>NEW SCORE</h2>
-      <p>Acabas de participar para ganar un pase triple a DESALIA.</p>
-      <p>Has llegado al nivel 2</p>
-      <button>PLAY AGAIN</button>
+    <div class="game-lost-pop-up hidden">
+      <h2 class="knockout">NEW SCORE</h2>
+      <p class="knockout">Acabas de participar para ganar un <br>pase triple a DESALIA.</p>
+      <p class="level-text knockout">Has llegado al nivel 2</p>
+      <button class="OSD-mono game-lost-restart-button">PLAY AGAIN</button>
     </div>
 
-    <div class="restart-win">
-      <h2>NEW SCORE</h2>
-      <p>Te has pasado el juego. ¡Ser un viciado tiene premio!</p>
-      <p>Ahora tienes más posibilidades de ganar tu pase a Desalia, y cuantas más partidas juegues, más posibilidades tienes de ganar tu pase.</p>
-      <button>PLAY AGAIN</button>
+    <div class="game-win-pop-up hidden">
+      <h2 class="knockout">NEW SCORE</h2>
+      <p class="knockout">Te has pasado el juego. ¡Ser un viciado tiene premio!</p>
+      <p class="knockout">Ahora tienes más posibilidades de ganar tu pase a Desalia, y cuantas más partidas juegues, más posibilidades tienes de ganar tu pase.</p>
+      <button class="OSD-mono game-win-restart-button">PLAY AGAIN</button>
     </div>
 
     <!-- image background  -->

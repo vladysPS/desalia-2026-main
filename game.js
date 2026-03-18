@@ -5,13 +5,26 @@ import Obstacle from './js/obstacle.js';
 import Logo from './js/logo.js';
 import Counter from './js/counter.js';
 import Levels from './js/levels.js';
+
+const gameOverPopUp = document.querySelector('.game-over');
+const scoreElement = gameOverPopUp.querySelector('.game-score');
+const gameOverButton = gameOverPopUp.querySelector('.game-over-button');
+
+const gameLostPopUp = document.querySelector('.game-lost-pop-up');
+const gameLostRestartButton = gameLostPopUp.querySelector('.game-lost-restart-button');
+const gameLostLevelText = gameLostPopUp.querySelector('.level-text');
+
+const gameWinPopUp = document.querySelector('.game-win-pop-up');
+const gameWinRestartButton = gameWinPopUp.querySelector('.game-win-restart-button');
+
+
 class Game {
   constructor(ctx, playerAvatar) {
     this.ctx = ctx;
     this.rafId = undefined; 
     this.isRunning = false;
     this.lastTime = 0;
-    this.todoRectoSinMiedo = true; 
+    this.todoRectoSinMiedo = false; 
     this.playerAvatar = playerAvatar;
 
     this.baseWidth = 1920;
@@ -80,19 +93,6 @@ class Game {
     const firstObstacle = new Obstacle(this.ctx, this.canvasWidth, this.canvasHeight, this.road, this.scale, randomType);
     this.obstacleInterval = this.getNextObstacleInterval(firstObstacle);
   }
-  // OLD TIME getRandomObstacleTime(level = this.currentLevel) {
-  //   const baseMin = 0.8; 
-  //   const baseMax = 1.7;   
-
-  //   // exponential difficulty: harder levels spawn faster
-  //   const factor = Math.pow(0.85, level - 1); 
-  //   const minInterval = Math.max(0.4, baseMin * factor);
-  //   const maxInterval = Math.max(0.6, baseMax * factor);
-
-  //   // ensure minimum time for player to react
-  //   const minSafe = 0.5; 
-  //   return Math.max(minSafe, minInterval + Math.random() * (maxInterval - minInterval));
-  // }
   getNextObstacleInterval(obstacle) {
     // Player jump physics
     const jumpDuration = 2 * Math.abs(this.player.jumpStrength) / this.player.gravity;
@@ -123,7 +123,6 @@ class Game {
     if (Math.random() < bonusChance) {
       const bonusMultiplier = 1.5 + Math.random() * 1.5; // 1.5–3x
       interval *= bonusMultiplier;
-      console.log(`Bonus gap! Interval increased: ${interval.toFixed(2)}s`);
     }
 
     return interval;
@@ -270,9 +269,6 @@ class Game {
       // CHECKING AND UPDATING THE LEVELS  
       if (this.background.img.isReady && this.segmentWidth === 0) {
           this.segmentWidth = (this.background.img.width * this.scale) / this.maxLevel;
-          
-          console.log("Segment width initialized:", this.segmentWidth);
-          console.log("Total width scaled:", this.background.img.width * this.scale);
       }
 
       const distance = -this.background.x;  // positive pixels scrolled
@@ -283,9 +279,6 @@ class Game {
           this.currentLevel++;
           this.applyLevelUp();
           this.levels.img.src = `imgs/levels/level-${this.currentLevel}.png`;
-          console.log("Level up! Current level:", this.currentLevel);
-          console.log("Current road speed:", this.road.speed);
-          console.log("Current background speed:", this.background.speed);
           //this.showLevelBanner(this.currentLevel); 
       }
 
@@ -327,12 +320,42 @@ class Game {
     this.rafId = requestAnimationFrame(step);
   }
   stopGame(reason) {
+    console.log(`Final score: ${Math.floor(this.score)}`);
+    console.log('Llamada a API para guardar puntuación');
+    
     if (reason === "lose"){
       console.log("You lost!");
+      gameOverPopUp.classList.remove('hidden');      
+      scoreElement.textContent = `${Math.floor(this.score)}`;
+      gameLostLevelText.textContent = `Has llegado al nivel ${this.currentLevel}`;
+
+      gameOverButton.onclick = () => {
+        gameOverPopUp.classList.add('hidden');
+        gameLostPopUp.classList.remove('hidden');
+      }
+
+      //check if last pop up is closed 
+      gameLostRestartButton.onclick = () => {
+        gameLostPopUp.classList.add('hidden');
+        console.log("llamada a API para volver a pantalla de poner nombre");
+      }
+      
     } else if (reason === "win"){
       console.log("You won!");
+      gameOverPopUp.classList.remove('hidden');      
+      scoreElement.textContent = `${Math.floor(this.score)}`;
+
+      gameOverButton.onclick = () => {
+        gameOverPopUp.classList.add('hidden');
+        gameWinPopUp.classList.remove('hidden');  
+      }
+
+      //check if last pop up is closed 
+      gameWinRestartButton.onclick = () => {
+        gameWinPopUp.classList.add('hidden');
+        console.log("llamada a API para volver a pantalla de poner nombre");
+      }
     }
-    console.log(`Final score: ${Math.floor(this.score)}`);
     if (!this.isRunning) return;
     cancelAnimationFrame(this.rafId);
     this.score = 0;
